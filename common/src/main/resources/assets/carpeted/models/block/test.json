@@ -1,0 +1,15 @@
+
+{
+  "parent": "forge:block/default",
+  "loader": "forge:obj",
+  "model": "carpeted:models/obj/carpet_stairs_overlay.obj",
+  "shade_quads": false,
+  "emissive_ambient": true,
+  "flip_v": true,
+  "transform":{
+    "translation": [ 0.5, 0.5, 0.5 ]
+  },
+  "textures": {
+
+  }
+}
