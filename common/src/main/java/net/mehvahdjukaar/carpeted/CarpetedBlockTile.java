@@ -11,13 +11,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class CarpetStairsBlockTile extends MimicBlockTile {
+public class CarpetedBlockTile extends MimicBlockTile {
 
-    public static final ModelDataKey<BlockState> CARPET = new ModelDataKey<>(BlockState.class);
+    public static final ModelDataKey<BlockState> CARPET_KEY = new ModelDataKey<>(BlockState.class);
 
     private BlockState carpet = Blocks.WHITE_CARPET.defaultBlockState();
 
-    public CarpetStairsBlockTile(BlockPos pos, BlockState state) {
+    public CarpetedBlockTile(BlockPos pos, BlockState state) {
         super(Carpeted.CARPET_STAIRS_TILE.get(), pos, state);
     }
 
@@ -25,7 +25,7 @@ public class CarpetStairsBlockTile extends MimicBlockTile {
     public ExtraModelData getExtraModelData() {
         return ExtraModelData.builder()
                 .with(MIMIC, mimic)
-                .with(CARPET, carpet)
+                .with(CARPET_KEY, carpet)
                 .build();
     }
 
@@ -55,7 +55,7 @@ public class CarpetStairsBlockTile extends MimicBlockTile {
                 this.setChanged();
                 int newLight = this.getLightValue();
                 this.level.setBlock(this.worldPosition, this.getBlockState()
-                        .setValue(CarpetStairBlock.LIGHT_LEVEL, newLight), 3);
+                        .setValue(CarpetStairBlock.LIGHT_LEVEL, newLight).setValue(CarpetSlabBlock.SOLID, state.canOcclude()), 3);
                 this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), Block.UPDATE_CLIENTS);
             } else {
                 this.requestModelReload();

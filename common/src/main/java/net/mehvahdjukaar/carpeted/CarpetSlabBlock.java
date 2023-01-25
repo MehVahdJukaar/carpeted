@@ -3,9 +3,7 @@ package net.mehvahdjukaar.carpeted;
 
 import dev.architectury.injectables.annotations.PlatformOnly;
 import net.mehvahdjukaar.moonlight.api.block.IBlockHolder;
-import net.mehvahdjukaar.moonlight.api.block.ModStairBlock;
 import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
-import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,7 +20,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -34,77 +31,44 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
-public class CarpetStairBlock extends ModStairBlock implements EntityBlock {
+public class CarpetSlabBlock extends SlabBlock implements EntityBlock {
 
-    public static final IntegerProperty LIGHT_LEVEL = CarpetSlabBlock.LIGHT_LEVEL;
-    public static final BooleanProperty SOLID = CarpetSlabBlock.SOLID;
+    public static final IntegerProperty LIGHT_LEVEL = IntegerProperty.create("light_level", 0, 15);
+    public static final BooleanProperty SOLID = BooleanProperty.create("solid");
+    protected static final VoxelShape BOTTOM_AABB = Block.box(0.0, 0.0, 0.0, 16.0, 9.0, 16.0);
 
-    public CarpetStairBlock(Block block) {
-        super(() -> block, Properties.copy(block)
+    public CarpetSlabBlock(Block block) {
+        super(Properties.copy(block)
                 .lightLevel(state -> Math.max(0, state.getValue(LIGHT_LEVEL))));
         this.registerDefaultState(this.defaultBlockState().setValue(SOLID,true).setValue(LIGHT_LEVEL, 0));
-        BlockState s = this.defaultBlockState();
-        for(Direction d : Direction.Plane.HORIZONTAL){
-            if(Direction.from2DDataValue(getShapeIndex(s.setValue(FACING,d))%4) != d){
-                int aa = 1;
-            }
-        }
     }
 
-    protected static final VoxelShape BOTTOM_AABB = Block.box(0.0, 0.0, -1.0, 16.0, 9.0, 16.0);
-    protected static final VoxelShape OCTET_NPN = Block.box(0.0, 8.0, 0.0, 9.0, 17.0, 9.0);
-    protected static final VoxelShape OCTET_NPP = Block.box(0.0, 8.0, 7.0, 9.0, 17.0, 16.0);
-    protected static final VoxelShape OCTET_PPN = Block.box(7.0, 8.0, 0.0, 16.0, 17.0, 9.0);
-    protected static final VoxelShape OCTET_PPP = Block.box(7.0, 8.0, 7.0, 16.0, 17.0, 16.0);
-    protected static final VoxelShape[] BOTTOM_SHAPES = makeShapes();
-    private static final int[] SHAPE_BY_STATE = new int[]{12, 5, 3, 10, 14, 13, 7, 11, 13, 7, 11, 14, 8, 4, 1, 2, 4, 1, 2, 8};
-
-    private static VoxelShape[] makeShapes() {
-        return IntStream.range(0, 16)
-                .mapToObj(CarpetStairBlock::makeStairShape)
-                .toArray(VoxelShape[]::new);
-    }
-
-    private static VoxelShape makeStairShape(int bitfield) {
-        Direction dir = switch (bitfield%4){
-            default ->  Direction.NORTH;
-            case 1->Direction.EAST;
-            case 2->Direction.WEST;
-            case 3->Direction.SOUTH;
-        };
-
-        VoxelShape voxelShape = Utils.rotateVoxelShape(BOTTOM_AABB, dir);
-        if ((bitfield & 1) != 0) {
-            voxelShape = Shapes.or(voxelShape, OCTET_NPN);
-        }
-        if ((bitfield & 2) != 0) {
-            voxelShape = Shapes.or(voxelShape, OCTET_PPN);
-        }
-        if ((bitfield & 4) != 0) {
-            voxelShape = Shapes.or(voxelShape, OCTET_NPP);
-        }
-        if ((bitfield & 8) != 0) {
-            voxelShape = Shapes.or(voxelShape, OCTET_PPP);
-        }
-        return voxelShape;
-    }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if (state.getValue(HALF) == Half.BOTTOM) return BOTTOM_SHAPES[SHAPE_BY_STATE[(getShapeIndex(state))]];
-        return super.getShape(state, level, pos, context);
+        return BOTTOM_AABB;
     }
 
     @Override
     public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
-        return state.getValue(SOLID) ? super.getOcclusionShape(state, level, pos) :Shapes.empty();
+        return state.getValue(SOLID) ? super.getOcclusionShape(state, level, pos) : Shapes.empty();
     }
 
-    private static int getShapeIndex(BlockState state) {
-        return state.getValue(SHAPE).ordinal() * 4 + state.getValue(FACING).get2DDataValue();
+    @Override
+    protected void spawnDestroyParticles(Level level, Player player, BlockPos pos, BlockState state) {
+        super.spawnDestroyParticles(level, player, pos, state);
+        if (level.getBlockEntity(pos) instanceof IBlockHolder tile) {
+            BlockState mimicState = tile.getHeldBlock(1);
+            if (!mimicState.isAir()) {
+                var sound = mimicState.getSoundType();
+                level.playSound(null,pos, sound.getBreakSound(), SoundSource.BLOCKS,
+                        (sound.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
+
+            }
+        }
     }
+
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -117,7 +81,7 @@ public class CarpetStairBlock extends ModStairBlock implements EntityBlock {
         if (worldIn.getBlockEntity(pos) instanceof IBlockHolder tile) {
             BlockState mimicState = tile.getHeldBlock();
             //prevent infinite recursion
-            if (!mimicState.isAir() && !(mimicState.getBlock() instanceof CarpetStairBlock))
+            if (!mimicState.isAir() && !(mimicState.getBlock() instanceof CarpetSlabBlock))
                 return mimicState.getDestroyProgress(player, worldIn, pos);
         }
         return super.getDestroyProgress(state, player, worldIn, pos);
@@ -134,25 +98,6 @@ public class CarpetStairBlock extends ModStairBlock implements EntityBlock {
         return super.getSoundType(state);
     }
 
-    @Override
-    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
-        super.destroy(level, pos, state);
-
-    }
-
-    @Override
-    protected void spawnDestroyParticles(Level level, Player player, BlockPos pos, BlockState state) {
-        super.spawnDestroyParticles(level, player, pos, state);
-        if (level.getBlockEntity(pos) instanceof IBlockHolder tile) {
-            BlockState mimicState = tile.getHeldBlock(1);
-            if (!mimicState.isAir()) {
-                var sound = mimicState.getSoundType();
-                level.playSound(null,pos, sound.getBreakSound(), SoundSource.BLOCKS,
-                        (sound.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
-
-            }
-        }
-    }
 
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {

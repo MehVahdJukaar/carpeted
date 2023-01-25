@@ -1,6 +1,6 @@
 package net.mehvahdjukaar.carpeted.client;
 
-import net.mehvahdjukaar.carpeted.CarpetStairsBlockTile;
+import net.mehvahdjukaar.carpeted.CarpetedBlockTile;
 import net.mehvahdjukaar.carpeted.CarpetedPlatformStuff;
 import net.mehvahdjukaar.moonlight.api.client.model.CustomBakedModel;
 import net.mehvahdjukaar.moonlight.api.client.model.ExtraModelData;
@@ -35,17 +35,17 @@ public class CarpetStairsModel implements CustomBakedModel {
 
         if (state != null) {
             try {
-                BlockState mimic = data.get(CarpetStairsBlockTile.MIMIC);
+                BlockState mimic = data.get(CarpetedBlockTile.MIMIC);
 
                 if (mimic != null) {
                     BakedModel model = blockModelShaper.getBlockModel(mimic);
-                    quads.addAll(model.getQuads(mimic, side, rand));
+                        quads.addAll(model.getQuads(mimic, side, rand));
                 }
             } catch (Exception ignored) {
             }
 
             try {
-                BlockState carpetBlock = data.get(CarpetStairsBlockTile.CARPET);
+                BlockState carpetBlock = data.get(CarpetedBlockTile.CARPET_KEY);
                 var supportQuads = carpet.getQuads(state, side, rand);
 
                 if (!supportQuads.isEmpty()) {
@@ -90,7 +90,7 @@ public class CarpetStairsModel implements CustomBakedModel {
 
     @Override
     public TextureAtlasSprite getBlockParticle(ExtraModelData data) {
-        BlockState mimic = data.get(CarpetStairsBlockTile.MIMIC);
+        BlockState mimic = data.get(CarpetedBlockTile.MIMIC);
         if (mimic != null && !mimic.isAir()) {
             BakedModel model = blockModelShaper.getBlockModel(mimic);
             try {

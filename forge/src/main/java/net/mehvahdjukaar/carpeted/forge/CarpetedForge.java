@@ -4,6 +4,8 @@ import net.mehvahdjukaar.carpeted.Carpeted;
 import net.mehvahdjukaar.carpeted.CarpetedClient;
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;

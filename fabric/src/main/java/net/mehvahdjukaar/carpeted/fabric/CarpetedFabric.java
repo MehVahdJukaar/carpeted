@@ -19,5 +19,8 @@ public class CarpetedFabric implements ModInitializer {
         }
 
         UseBlockCallback.EVENT.register(Carpeted::onRightClickBlock);
+
+        FabricSetupCallbacks.finishModInit(Carpeted.MOD_ID);
+
     }
 }

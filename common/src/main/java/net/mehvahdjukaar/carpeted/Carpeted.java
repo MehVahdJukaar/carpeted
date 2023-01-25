@@ -18,10 +18,12 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
@@ -50,11 +52,10 @@ public class Carpeted {
                 bi.getBlock() instanceof CarpetBlock) {
             BlockPos pos = hitResult.getBlockPos();
             BlockState state = level.getBlockState(pos);
-            if (state.getBlock() instanceof StairBlock &&
-                    state.getValue(StairBlock.HALF) == Half.BOTTOM &&
-                    !(state.getBlock() instanceof EntityBlock)) {
-                level.setBlockAndUpdate(pos, CARPET_STAIRS.get().withPropertiesOf(state));
-                if (level.getBlockEntity(pos) instanceof CarpetStairsBlockTile tile) {
+            BlockState replacingBlock = getReplacingBlock(state);
+            if (replacingBlock != null) {
+                level.setBlockAndUpdate(pos, replacingBlock);
+                if (level.getBlockEntity(pos) instanceof CarpetedBlockTile tile) {
                     var carpet = bi.getBlock().defaultBlockState();
                     tile.initialize(state, carpet);
                     if (!player.getAbilities().instabuild) stack.shrink(1);
@@ -76,11 +77,28 @@ public class Carpeted {
         return InteractionResult.PASS;
     }
 
+    @Nullable
+    private static BlockState getReplacingBlock(BlockState state) {
+        Block b = state.getBlock();
+        if (!(b instanceof EntityBlock)) {
+            if (b instanceof StairBlock &&
+                    state.getValue(StairBlock.HALF) == Half.BOTTOM) {
+                return CARPET_STAIRS.get().withPropertiesOf(state);
+            } else if (b instanceof SlabBlock && state.getValue(SlabBlock.TYPE) == SlabType.BOTTOM) {
+                return CARPET_SLAB.get().withPropertiesOf(state);
+            }
+        }
+        return null;
+    }
+
     public static final Supplier<Block> CARPET_STAIRS = RegHelper.registerBlock(res("carpet_stairs"),
             () -> new CarpetStairBlock(Blocks.OAK_STAIRS));
 
-    public static final Supplier<BlockEntityType<CarpetStairsBlockTile>> CARPET_STAIRS_TILE =
-            RegHelper.registerBlockEntityType(res("carpet_stairs"),
-                    () -> PlatformHelper.newBlockEntityType(CarpetStairsBlockTile::new, CARPET_STAIRS.get()));
+    public static final Supplier<Block> CARPET_SLAB = RegHelper.registerBlock(res("carpet_slab"),
+            () -> new CarpetSlabBlock(Blocks.OAK_SLAB));
+
+    public static final Supplier<BlockEntityType<CarpetedBlockTile>> CARPET_STAIRS_TILE =
+            RegHelper.registerBlockEntityType(res("carpeted_block"),
+                    () -> PlatformHelper.newBlockEntityType(CarpetedBlockTile::new, CARPET_STAIRS.get(), CARPET_SLAB.get()));
 
 }
