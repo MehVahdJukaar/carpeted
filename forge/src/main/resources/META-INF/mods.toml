@@ -39,12 +39,12 @@ issueTrackerURL = "https://github.com/MehVahdJukaar/carpeted/issues"
 [[dependencies.carpeted]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.2,1.20)"
+    versionRange="[1.20,1.21)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.carpeted]]
     modId="moonlight"
     mandatory=true
-    versionRange="[1.19.2-2.0.35,]"
+    versionRange="[1.20-2.5.0,]"
     side="BOTH"

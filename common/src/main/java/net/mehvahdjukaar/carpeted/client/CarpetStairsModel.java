@@ -35,7 +35,7 @@ public class CarpetStairsModel implements CustomBakedModel {
 
         if (state != null) {
             try {
-                BlockState mimic = data.get(CarpetedBlockTile.MIMIC);
+                BlockState mimic = data.get(CarpetedBlockTile.MIMIC_KEY);
 
                 if (mimic != null) {
                     BakedModel model = blockModelShaper.getBlockModel(mimic);
@@ -90,7 +90,7 @@ public class CarpetStairsModel implements CustomBakedModel {
 
     @Override
     public TextureAtlasSprite getBlockParticle(ExtraModelData data) {
-        BlockState mimic = data.get(CarpetedBlockTile.MIMIC);
+        BlockState mimic = data.get(CarpetedBlockTile.MIMIC_KEY);
         if (mimic != null && !mimic.isAir()) {
             BakedModel model = blockModelShaper.getBlockModel(mimic);
             try {

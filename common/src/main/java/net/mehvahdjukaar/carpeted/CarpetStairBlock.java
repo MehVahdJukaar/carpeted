@@ -6,6 +6,7 @@ import net.mehvahdjukaar.moonlight.api.block.IBlockHolder;
 import net.mehvahdjukaar.moonlight.api.block.ModStairBlock;
 import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
 import net.mehvahdjukaar.moonlight.api.util.Utils;
+import net.mehvahdjukaar.moonlight.api.util.math.MthUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,6 +26,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -75,7 +77,7 @@ public class CarpetStairBlock extends ModStairBlock implements EntityBlock {
             case 3->Direction.SOUTH;
         };
 
-        VoxelShape voxelShape = Utils.rotateVoxelShape(BOTTOM_AABB, dir);
+        VoxelShape voxelShape = MthUtils.rotateVoxelShape(BOTTOM_AABB, dir);
         if ((bitfield & 1) != 0) {
             voxelShape = Shapes.or(voxelShape, OCTET_NPN);
         }
@@ -155,14 +157,14 @@ public class CarpetStairBlock extends ModStairBlock implements EntityBlock {
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         List<ItemStack> drops = super.getDrops(state, builder);
         if (builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof IBlockHolder tile) {
             //checks again if the content itself can be mined
             BlockState heldState = tile.getHeldBlock(0);
             BlockState carpet = tile.getHeldBlock(1);
             if (builder.getOptionalParameter(LootContextParams.THIS_ENTITY) instanceof ServerPlayer player) {
-                if (ForgeHelper.canHarvestBlock(heldState, builder.getLevel(), new BlockPos(builder.getParameter(LootContextParams.ORIGIN)), player)) {
+                if (ForgeHelper.canHarvestBlock(heldState, builder.getLevel(), BlockPos.containing(builder.getParameter(LootContextParams.ORIGIN)), player)) {
                     drops.addAll(heldState.getDrops(builder));
                 }
             }

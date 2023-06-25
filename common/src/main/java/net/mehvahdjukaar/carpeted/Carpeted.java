@@ -1,7 +1,7 @@
 package net.mehvahdjukaar.carpeted;
 
 import net.mehvahdjukaar.moonlight.api.misc.EventCalled;
-import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -99,6 +99,6 @@ public class Carpeted {
 
     public static final Supplier<BlockEntityType<CarpetedBlockTile>> CARPET_STAIRS_TILE =
             RegHelper.registerBlockEntityType(res("carpeted_block"),
-                    () -> PlatformHelper.newBlockEntityType(CarpetedBlockTile::new, CARPET_STAIRS.get(), CARPET_SLAB.get()));
+                    () -> PlatHelper.newBlockEntityType(CarpetedBlockTile::new, CARPET_STAIRS.get(), CARPET_SLAB.get()));
 
 }

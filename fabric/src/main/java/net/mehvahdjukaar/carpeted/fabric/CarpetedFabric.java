@@ -4,8 +4,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.mehvahdjukaar.carpeted.Carpeted;
 import net.mehvahdjukaar.carpeted.CarpetedClient;
-import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
-import net.mehvahdjukaar.moonlight.fabric.FabricSetupCallbacks;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
+import net.mehvahdjukaar.moonlight.fabric.MLFabricSetupCallbacks;
 
 public class CarpetedFabric implements ModInitializer {
 
@@ -14,13 +14,13 @@ public class CarpetedFabric implements ModInitializer {
 
         Carpeted.commonInit();
 
-        if (PlatformHelper.getEnv().isClient()) {
-            FabricSetupCallbacks.CLIENT_SETUP.add(CarpetedClient::init);
+        if (PlatHelper.getPhysicalSide().isClient()) {
+            MLFabricSetupCallbacks.CLIENT_SETUP.add(CarpetedClient::init);
         }
 
         UseBlockCallback.EVENT.register(Carpeted::onRightClickBlock);
 
-        FabricSetupCallbacks.finishModInit(Carpeted.MOD_ID);
+        //MLFabricSetupCallbacks.finishModInit(Carpeted.MOD_ID);
 
     }
 }
