@@ -44,19 +44,17 @@ public class Carpeted {
     }
 
     @EventCalled
-    public static InteractionResult onRightClickBlock(Player player, Level level, InteractionHand hand,
+    public static InteractionResult onRightClickBlock(Player player, Level level, ItemStack stack, CarpetBlock block,
                                                       BlockHitResult hitResult) {
         if (player.isSecondaryUseActive()) return InteractionResult.PASS;
-        ItemStack stack = player.getItemInHand(hand);
-        if (player.getAbilities().mayBuild && stack.getItem() instanceof BlockItem bi &&
-                bi.getBlock() instanceof CarpetBlock) {
+        if (player.getAbilities().mayBuild) {
             BlockPos pos = hitResult.getBlockPos();
             BlockState state = level.getBlockState(pos);
             BlockState replacingBlock = getReplacingBlock(state);
             if (replacingBlock != null) {
                 level.setBlockAndUpdate(pos, replacingBlock);
                 if (level.getBlockEntity(pos) instanceof CarpetedBlockTile tile) {
-                    var carpet = bi.getBlock().defaultBlockState();
+                    var carpet = block.defaultBlockState();
                     tile.initialize(state, carpet);
                     if (!player.getAbilities().instabuild) stack.shrink(1);
 

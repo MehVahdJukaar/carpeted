@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CarpetedPlatformStuffImpl {
+
+
     public static void removeAmbientOcclusion(List<BakedQuad> supportQuads) {
         supportQuads.replaceAll(quad->{
             int[] vertices = quad.getVertices();
